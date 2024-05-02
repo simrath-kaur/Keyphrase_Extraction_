@@ -1,0 +1,726 @@
+{
+  "title": "Keyphrase Extraction from Scientific Articles
+ via Extractive Summarization",
+  "abstract": " Automatically extracting keyphrases from
+ scholarly documents leads to a valuable con
+cise representation that humans can under
+stand and machines can process for tasks, such
+ as information retrieval, article clustering and
+ article classification. This paper is concerned
+ with the parts of a scientific article that should
+ be given as input to keyphrase extraction meth
+ods. Recent deep learning methods take ti
+tles and abstracts as input due to the increased
+ computational complexity in processing long
+ sequences, whereas traditional approaches can
+ also work with full-texts. Titles and abstracts
+ are dense in keyphrases, but often miss im
+portant aspects of the articles, while full-texts
+ on the other hand are richer in keyphrases but
+ muchnoisier. To address this trade-off, we pro
+pose the use of extractive summarization mod
+els on the full-texts of scholarly documents.
+ Our empirical study on 3 article collections
+ using 3 keyphrase extraction methods shows
+ promising results.",
+  "fulltext": "Automatic keyphrase extraction is the process of
+ identifying representative phrases in a document
+ that summarize its content. Keyphrases are impor
+tant pieces of information for many applications,
+ including information retrieval (Ji et al., 2019;
+ Boudin et al., 2020), text classification (Meng et al.,
+ 2019), text summarization (Song et al., 2019), en
+tity recognition (Du et al., 2018) and event detec
+tion (Hossny et al., 2020).
+ This work focuses on keyphrase extraction from
+ scholarly documents. In particular, we consider an
+ interesting issue in this domain, which concerns
+ the part of a scientific article that should be given
+ as input to keyphrase extraction methods.
+ Table 1 shows representative supervised and un
+supervised keyphrase extraction methods from the
+ most popular categories of the task (deep learning,
+ traditional supervised, graph-based, and statistics
+based), along with the parts of academic articles
+ that they consider, among Title+Abstract (TA),
+ Full-text (F) and other Specific Parts (S/P).
+ Approaches
+ TA F S/P
+ Deep Learning
+ Meng et al. (2017)
+ Basaldella et al. (2018)
+ Chen et al. (2018)
+ Ye and Wang (2018)
+ Wang et al. (2018)
+ Patel and Caragea (2019)
+ Chan et al. (2019)
+ Alzaidy et al. (2019)
+ Chen et al. (2019)
+ Çano and Bojar (2019)
+ Zhu et al. (2020)
+ Zhou et al. (2020)
+ Zahedi et al. (2020)
+ Traditional Supervised
+ Witten et al. (1999)
+ Medelyan et al. (2009)
+ Nguyen and Luong (2010)
+ Caragea et al. (2014)
+ Wang and Li (2017)
+ Graph-based
+ Mihalcea and Tarau (2004)* 
+Wan and Xiao (2008)*
+ Bougouin et al. (2013)
+ Sterckx et al. (2015)
+ Boudin (2018)
+ Mahata et al. (2018)
+ Statistics-based
+ TfIdf
+ El-Beltagy and Rafea (2009) 
+Campos et al. (2020)
+ Table 1: Types of textual content, i.e., Title+Abstract
+ (TA), Full-text (F), and Specific Parts (S/P) of the docu
+ment, used by supervised and unsupervised keyphrase
+ extraction approaches in the training and evaluation
+ process. Approaches with an asterisk (*) are evaluated
+ on TAs and Fs in Hasan and Ng (2010).
+ Wecan see that recent deep learning keyphrase
+ extraction and generation methods take titles and
+ abstracts as input, due to the complexity in pro
+49
+ Proceedings of the Second Workshop on Scholarly Document Processing, pages 49–55
+ June 10, 2021. ©2021 Association for Computational Linguistics
+cessing larger sequences. Traditional supervised
+ learning methods, as well as unsupervised ones can
+ handle full-texts, but this does not necessarily lead
+ to better results compared to using just titles and ab
+stracts. Papagiannopoulou and Tsoumakas (2018)
+ show that graph-based methods achieve better ac
+curacy when titles and abstracts are used, while
+ the strong baseline TfIdf works best with full-text.
+ Florescu and Caragea (2017) and Boudin (2018)
+ show that keyphrases generally occur in positions
+ very close to the beginning of a scholarly document.
+ Nguyen and Luong (2010) show that title and ab
+stracts have the highest density of keyphrases, fol
+lowed by the conclusions, introduction and related
+ work sections.
+ It appears that there is a trade-off between us
+ing titles and abstracts versus using full-texts of
+ academic papers as input to keyphrase extraction
+ methods. Full-texts provide richer information, in
+cluding more keyphrases, but at the same time they
+ are much more noisy compared to the titles and
+ abstracts. Motivated from this observation, our
+ scientific question is whether using automated sum
+marization models on the full-text of a scientific
+ article can lead to textual information that is richer
+ than titles and abstracts, yet less noisy than full
+texts.
+ Towards answering this question, we present
+ some first steps employing extractive summariza
+tion. Our main goals are to: a) investigate the
+ dynamics of summarization in keyphrase extrac
+tion, paving the way for the research community
+ to develop approaches combining techniques from
+ both tasks (e.g., via multi-task learning) and b) pro
+vide some guidelines to practitioners of the field
+ suggesting better utilization of the full-texts. Our
+ empirical study provides strong evidence that the
+ full-text extractive summaries manage to capture
+ keyphrases, which in most cases improve the per
+formance of state-of-the-art supervised and unsu
+pervised keyphrase extraction methods (regarding
+ the F1 score) on three datasets compared to the
+ conventional use of abstracts and full-texts.
+ 2 OurApproachandAlternatives
+ We are interested in finding out whether we can
+ improve the signal-to-noise ratio of the input given
+ to keyphrase extraction approaches by applying au
+tomated summarization on the full-text of scientific
+ articles. As a first step towards investigating this
+ models.
+ Wegenerate extractive summaries from the cor
+responding full-texts using the pre-trained distil
+lated RoBERTa model distilroberta-base-ext-sum
+ from the TransformerSum1 library. Distillated
+ RoBERTa is a version of RoBERTa (Liu et al.,
+ 2019), which is based on DistilBERT (Sanh et al.,
+ 2019). It is a lighter, faster and smaller variant of
+ the original RoBERTa, that achieves a time speed
+up of 50%, while retaining 95% performance of
+ the original model.
+ Furthermore, we investigate the utility of alterna
+tive input types, such as the first three paragraphs
+ of the document that include the title, the abstract
+ and a part of the document’s introduction. We ex
+periment with two different paragraph lengths in
+ words, i.e., 220 and 400.
+ Our investigation includes the standard input
+ types, i.e., title+abstract and full-text, too. For deep
+ learning methods, we split full-texts into sentences
+ and paragraphs, as they cannot handle their whole
+ length at once due to memory limitations.
+ Finally, we explore an ensemble approach to
+ keyphrase extraction, which involves the late fusion
+ of two input types: the standard title plus abstract
+ and the title plus the extractive summary. We apply
+ keyphrase extraction methods to these two input
+ types independently and then consider the union of
+ the extracted keyphrases.
+ Table 2 presents all these approaches along with
+ their abbreviations, which will be used in the rest
+ of our work.
+ Abbr.
+ Description
+ TA
+ ABSE
+ F
+ FP
+ FS
+ TS
+ AS
+ Abstract
+ Abstract in Sentences
+ Full-text
+ Full-text in Paragraphs
+ Full-text in Sentences
+ Extractive Summary
+ Abstract Extractive Summary
+ 3P220 First 3 Paragraphs- length in words: 220
+ 3P400 First 3 Paragraphs- length in words: 400
+ Table 2: Descriptions of the different approaches along
+ with their abbreviations. The title is part of the input in
+ all cases.
+ 3 Experimental Setup
+ Our empirical study includes three keyphrase ex
+traction methods: TfIdf, as a baseline method, Mul
+tipartiteRank (MR) (Boudin, 2018), as a strong
+ 50
+ hypothesis, we focus on extractive summarization
+ 1https://github.com/HHousen/TransformerSum
+4 Results and Discussion
+ graph-based method, and Bi-LSTM-CRF (BLC)
+ (Alzaidy et al., 2019), as a strong neural model.
+ Due to the lack of publicly available code for a
+ BLC model tailored to keyphrase extraction, we
+ proceeded to our own implementation, which we
+ make publicly available along with all experiments
+ in this paper2.
+ BLCis trained using the train and validation sets
+ from (Meng et al., 2017). Specifically, we trained
+ both models described in (Alzaidy et al., 2019),
+ i.e., the BLCTA on the documents’ abstracts and
+ the BLCABSE on the abstracts’ sentences (used
+ only with test datasets that their text is split in
+ sentences and only for the model comparison). Ex
+periments were performed on a Ryzen 5 3600 CPU
+ with 16GB RAM. Training the model on title and
+ abstract takes approximately 24 hours for a total of
+ 5 epochs, while training on title and abstract split
+ in sentences takes about 5 hours to complete.
+ These keyphrase extraction methods are evalu
+ated on three well-known datasets that contain full
+text articles from the computer science domain: Se
+mEval (Kim et al., 2010), NUS (Nguyen and Kan,
+ 2007), and ACM (Krapivin et al., 2008). These
+ datasets contain 244, 211, and 2304 documents,
+ respectively (we merged the train and test sets of
+ the SemEval dataset).
+ Wecompute F1 (F1@10 for unsupervised meth
+ods) according to both the exact (E) and partial (P)
+ (Rousseau and Vazirgiannis, 2015) string match to
+ determine the number of correctly matched phrases
+ with the golden ones for a document. We also apply
+ stemming to the methods’ output and the article’s
+ golden phrases as a pre-processing step before the
+ evaluation process. We employ the authors’ and
+ readers’ (in case they are available) keyphrases as a
+ gold evaluation standard for all dataset collections.
+ Finally, we use a two-sided Wilcoxon signed
+rank test to check the statistical significance of the
+ results in terms of the most popular exact match
+ evaluation between the proposed input types and
+ the conventional ones, at a significance level of
+ 0.05. We denote with a “*” the statistical signif
+icance with TA and with a “” the statistical sig
+nificance with ABSE or F (in cases there is an
+ improvement).
+ 2https://github.com/intelligence-csd-auth-gr/keyphrase
+extraction-via-summarization
+ Table 3 gives the percentage and actual number
+ (in parentheses) of keyphrases that appear inside
+ each textual content type (F, 3P400, 3P220, TS, TA)
+ for each of the 3 datasets (SemEval, NUS, ACM).
+ We can see that full-texts contain the highest per
+centage of keyphrases, as expected. Note that this
+ number is less than 1, as a small percentage of the
+ keyphrases that authors or readers assign to papers
+ do not appear inside the paper’s full-text. The per
+centages of 3P400 and 3P220 are high too. Extrac
+tive summaries contain less keyphrases than the pre
+vious content types, but more than titles+abstracts.
+ This is a positive sign, which combined with low
+ amount of noise, could lead to improved keyphrase
+ extraction results.
+ SemEval
+ NUS
+ ACM
+ F
+ 3P400
+ 3P220
+ TS
+ TA
+ 0.857 (3239) 0.878 (2157) 0.738 (9079)
+ 0.668 (2523) 0.696 (1710) 0.665 (8172)
+ 0.582 (2197) 0.624 (1533) 0.616 (7572)
+ 0.518 (1956) 0.576 (1415) 0.573 (7041)
+ 0.439 (1658) 0.514 (1264) 0.530 (6518)
+ TotalKPs
+ 3778
+ 2458
+ 12296
+ Table 3: Percentage of keyphrases, along with ac
+tual number of keyphrases inside parentheses, that
+ are found in each textual content type (TA, F, TS,
+ 3P220, 3P400) for each of the 3 datasets (SemEval,
+ NUS, ACM). The last row shows the total number of
+ keyphrases per dataset (TotalKPs).
+ One disadvantage of extractive summaries, is
+ that they require an additional pre-processing step
+ compared to the rest pre-existing textual content
+ types. The average time to generate the extractive
+ summary per document in the machine used for the
+ experiments is 2.21, 2.13, and 2.34 seconds for the
+ SemEval, NUS, and ACM datasets, respectively.
+ This is not high for offline applications, while for
+ online ones, higher scale hardware and/or more
+ efficient architectures could be employed.
+ 4.1 Bi-LSTM-CRF
+ Table 4 shows the results of our implementation
+ of the BLC model, along with the ones published
+ in (Alzaidy et al., 2019) for the kp20k test set
+ from (Meng et al., 2017). BLC solves a sequence
+ classification task: for each word, it outputs a bi
+nary label indicating whether this word belongs
+ to a keyphrase or not. The evaluation of BLC in
+ (Alzaidy et al., 2019) was based on the F1-score of
+ this binary sequence classification task that BLC
+ 51
+52
+ solves,whichwealsocomputeforourimplemen
+tation.Wealsoshowtheresultsofourimplemen
+tationintermsoftheexactandpartialevaluation
+ approaches.
+ S E P
+ OurBLCTA 0.381 0.137 0.408
+ OriginalBLCTA 0.418-
+OurBLCABSE 0.288 0.150 0.301
+ OriginalBLCABSE 0.356-
+Table4:F1basedonsequence(S),exact(E)andpartial
+ (P)evaluationfor theoriginalBLCapproachandour
+ implementation.
+ TheresultsofthetwoBLCTAimplementations
+ areclosetoeachother. Thedifferencecouldbe
+ attributedtotwothings:a)thepre-processingofthe
+ data,whichisnotdescribedindetailin(Alzaidy
+ et al., 2019), andb) thefact thatAlzaidyet al.
+ (2019)mighthavenot includedthetitleintheir
+ experiments,asthisisnotclearinthepaper.For
+ BLCABSE, thedifferenceis largerwhichmight
+ bearesultof theaboveandtheselectedhyper
+parameters,whichwefine-tunedonBLCTA.
+ Table 5 shows the results ofBLCwith the
+ standardandproposedinput types. Resultsindi
+catenosignificant improvementusingextractive
+ summariescomparedtotitlesandabstracts,even
+ thoughTSincludesmorekeyphrasesacrossall
+ datasets(seeTable3). However, thisevaluation
+ maybeslightlyunfairtoTSasinputtoBLC,since
+ themodelusedtheoriginaldocuments’abstracts
+ for training. TAsandTSsmayhavesubstantial
+ differencesintheirsyntax,structure,etc.Never
+theless,ASperformsbetterthanTA,meaningthat
+ TSmanagestointroduceunseenkeyphrasestoTA,
+ whichseemspromisingforthepotentialofextrac
+tivesummarization.
+ SemEval NUS ACM
+ BLC E P E P E P
+ TA 0.103 0.196 0.129 0.270 0.148 0.325
+ ABSE 0.161 0.325 0.182 0.360 0.179 0.387
+ FP 0.157 0.349 0.144 0.319 0.082 0.241
+ FS 0.132 0.316 0.102 0.226 0.068 0.175
+ TS 0.097 0.192 0.128 0.265 0.139 0.317
+ AS 0.118 0.226 0.145 0.300 0.151 0.345
+ 3P220 0.143 0.264 0.168 0.337 0.157 0.352
+ 3P400 0.088 0.187 0.102 0.239 0.138 0.336
+ Table5: F1 basedonexact (E) andpartial (P) eval
+uationapproachforBLCon3differentdatasets (Se
+mEval,NUS,ACM)usingvarioustextualcontenttypes
+ asinput,i.e.,TA,ABSE,FP,FS,TS,AS,3P220,3P400.
+ Inaddition,ourfindingsshowthatweachieve
+ higherF1-scoreswhenwepredictontheabstracts
+ splitintosentencesratherthantheentireabstract.
+ Thisindicatestheinabilityofthemodeltoretain
+ pastinformationfromlongertextexcerpts,which
+ isacommonproblemforRNNs. Notethat for
+ all theresultsof theexperimentsinTable5,we
+ utilizeonlytheBLCTAmodel, evenonthetext
+ excerptssplit insentencesasitshowedsuperior
+ performancethantheBLCABSE.
+ Moreover,FPand3P220seemtobebetteralter
+nativestoTA,astheyconstituterichersourcesin
+ keyphrases,andthetrainedBLCTAmodelcanuti
+lizethemproperly.Finally,theFSapproachfailsto
+ detectthefull-text’skeyphrasesduetothecombina
+tionofnoiseandthedisparityofimportantcontext,
+ whichisaresultoftheextremefragmentationof
+ longtextstosentences.
+ 4.2 Unsupervisedmethods
+ Tables6and7showthat theunsupervisedmeth
+odsTfIdfandMRcertainlybenefit fromtheex
+tractivesummaries (TS)as theyoutperformthe
+ conventionalapproaches(TA,F)(except for the
+ MRmethodonNUSwheretheTS’sF1-scoreis
+ slightlylowerthantheF’sone). 3P200and3P400
+ approaches, inmost cases, donot improve the
+ correspondingmethods’accuracy. Althoughthe
+ introductorypartsof adocument containmany
+ keyphrases,theyarealsoquitenoisyduetogeneral
+ descriptionsrelatedtothedocument’stopics.
+ SemEval NUS ACM
+ TfIdf E P E P E P
+ TA 0.143 0.312 0.179 0.377 0129 0.351
+ F 0.140 0.289 0.193 0.347 0.112 0.285
+ TS 0.162 0.325 0.201 0.388 0.143 0.361
+ AS 0.160 0.349 0.190 0.393 0.129 0.349
+ 3P220 0.134 0.325 0.139 0.317 0.083 0.245
+ 3P400 0.160 0.362 0.171 0.361 0.099 0.277
+ Table6:F1@10basedonexact(E)andpartial(P)eval
+uationapproachforTfIdfon3differentdatasets (Se
+mEval,NUS,ACM)usingvarioustextualcontenttypes
+ asinput,i.e.,TA,F,TS,AS,3P220,3P400.
+ 5 ConclusionsandFutureWork
+ Ourworksetouttoinvestigatewhetherusingauto
+matedsummarization,asapre-processingstep,can
+ leadtoimprovedresultsinthetaskofkeyphraseex
+tractionfromscholarlydocuments.Ourempirical
+ studyshowsthatunsupervisedapproachesimprove
+SemEval
+ NUS
+ ACM
+ MR
+ E
+ P
+ E
+ P
+ E
+ P
+ TA
+ F
+ 0.137
+ 0.135
+ 0.344 0.154 0.376 0.116 0.354
+ 0.343 0.158 0.396 0.100 0.333
+ TS
+ 0.145
+ 0.358 0.157 0.383 0.117 0.360
+ AS 0.150 0.367 0.158 0.376 0.110 0.339
+ 3P220
+ 3P400
+ 0.128
+ 0.134
+ 0.335 0.125 0.309 0.077 0.247
+ 0.351 0.135 0.324 0.083 0.261
+ Table 7: F1@10 based on exact (E) and partial (P) eval
+uation approach for MR on 3 different datasets (Se
+mEval, NUS, ACM) using various input types, i.e., TA,
+ F, TS, AS, 3P220, 3P400.
+ their accuracy using extractive summaries as in
+put, highlighting the full-text’s useful information
+ for the task and showing a positive relationship be
+tween the tasks of extractive summarization and
+ keyphrase extraction.
+ It is worth noting that even though the gains on
+ the exact match F1-scores seem to be moderate,
+ this does not necessarily reflect the actual perfor
+mance gain. Considering that exact match scores
+ are generally low due to the strict nature of the
+ method, a moderate increase in performance leads
+ to considerable percentage gain over the initial per
+formance.
+ As future work, an interesting direction would
+ be to experiment with additional summarization
+ methods, including abstractive ones as well as their
+ combination with extractive ones. In addition, we
+ could experiment with additional recent and state
+of-the-art keyphrase extraction methods, including
+ methods building on top of contextual embeddings
+ (Sahrawat et al., 2020).
+ References
+ Rabah Alzaidy, Cornelia Caragea, and C. Lee Giles.
+ 2019. Bi-lstm-crf sequence labeling for keyphrase
+ extraction from scholarly documents. In The World
+ Wide Web Conference, WWW 2019, San Francisco,
+ CA, USA, May 13-17, 2019, pages 2551–2557.
+ ACM.
+ Marco Basaldella, Elisa Antolli, Giuseppe Serra, and
+ Carlo Tasso. 2018. Bidirectional LSTM recurrent
+ neural network for keyphrase extraction. In Digi
+tal Libraries and Multimedia Archives- 14th Italian
+ Research Conference on Digital Libraries, IRCDL
+ 2018, Udine, Italy, January 25-26, 2018, Proceed
+ings, volume 806 of Communications in Computer
+ and Information Science, pages 180–187. Springer.
+ Florian Boudin. 2018. Unsupervised keyphrase extrac
+tion with multipartite graphs. In Proceedings of the
+ 2018 Conference of the North American Chapter of
+ the Association for Computational Linguistics: Hu
+man Language Technologies, Volume 2 (Short Pa
+pers), pages 667–672, New Orleans, Louisiana. As
+sociation for Computational Linguistics.
+ Florian Boudin, Ygor Gallina, and Akiko Aizawa.
+ 2020. Keyphrase generation for scientific document
+ retrieval. In Proceedings of the 58th Annual Meet
+ing of the Association for Computational Linguistics,
+ pages 1118–1126, Online. Association for Computa
+tional Linguistics.
+ Adrien Bougouin, Florian Boudin, and Béatrice Daille.
+ 2013. TopicRank: Graph-based topic ranking for
+ keyphrase extraction. In Proceedings of the Sixth In
+ternational Joint Conference on Natural Language
+ Processing, pages 543–551, Nagoya, Japan. Asian
+ Federation of Natural Language Processing.
+ Ricardo Campos, Vítor Mangaravite, Arian Pasquali,
+ Alípio Jorge, Célia Nunes, and Adam Jatowt. 2020.
+ Yake! keyword extraction from single documents us
+ing multiple local features. Inf. Sci., 509:257–289.
+ Erion Çano and Ondˇ rej Bojar. 2019. Keyphrase gener
+ation: A text summarization struggle. In Proceed
+ings of the 2019 Conference of the North American
+ Chapter of the Association for Computational Lin
+guistics: Human Language Technologies, Volume 1
+ (Long and Short Papers), pages 666–672, Minneapo
+lis, Minnesota. Association for Computational Lin
+guistics.
+ Cornelia Caragea, Florin Adrian Bulgarov, Andreea
+ Godea, and Sujatha Das Gollapalli. 2014. Citation
+enhanced keyphrase extraction from research pa
+pers: A supervised approach. In Proceedings of
+ the 2014 Conference on Empirical Methods in Nat
+ural Language Processing (EMNLP), pages 1435
+1446, Doha, Qatar. Association for Computational
+ Linguistics.
+ HouPongChan,WangChen,LuWang,andIrwinKing.
+ 2019. Neural keyphrase generation via reinforce
+ment learning with adaptive rewards. In Proceed
+ings of the 57th Annual Meeting of the Association
+ for Computational Linguistics, pages 2163–2174,
+ Florence, Italy. Association for Computational Lin
+guistics.
+ Jun Chen, Xiaoming Zhang, Yu Wu, Zhao Yan, and
+ Zhoujun Li. 2018. Keyphrase generation with corre
+lation constraints. In Proceedings of the 2018 Con
+ference on Empirical Methods in Natural Language
+ Processing, pages 4057–4066, Brussels, Belgium.
+ Association for Computational Linguistics.
+ Wang Chen, Yifan Gao, Jiani Zhang, Irwin King, and
+ Michael R. Lyu. 2019. Title-guided encoding for
+ keyphrase generation. In The Thirty-Third AAAI
+ Conference on Artificial Intelligence, AAAI 2019,
+ The Thirty-First Innovative Applications of Artificial
+ Intelligence Conference, IAAI 2019, The Ninth AAAI
+ Symposium on Educational Advances in Artificial
+ Intelligence, EAAI 2019, Honolulu, Hawaii, USA,
+ 53
+January 27- February 1, 2019, pages 6268–6275.
+ AAAI Press.
+ Jingcheng Du, Yaoyun Zhang, Jianhong Luo, Yuxi Jia,
+ Qiang Wei, Cui Tao, and Hua Xu. 2018. Extracting
+ psychiatric stressors for suicide from social media
+ using deep learning. BMC Medical Informatics De
+cis. Mak., 18(S-2):77–87.
+ Samhaa R. El-Beltagy and Ahmed A. Rafea. 2009. Kp
+miner: A keyphrase extraction system for english
+ and arabic documents. Inf. Syst., 34(1):132–144.
+ Corina Florescu and Cornelia Caragea. 2017. Position
+Rank: An unsupervised approach to keyphrase ex
+traction from scholarly documents. In Proceedings
+ of the 55th Annual Meeting of the Association for
+ Computational Linguistics (Volume 1: Long Papers),
+ pages 1105–1115, Vancouver, Canada. Association
+ for Computational Linguistics.
+ Kazi Saidul HasanandVincentNg.2010. Conundrums
+ in unsupervised keyphrase extraction: Making sense
+ of the state-of-the-art. In COLING 2010, 23rd Inter
+national Conference on Computational Linguistics,
+ Posters Volume, 23-27 August 2010, Beijing, China,
+ pages 365–373. Chinese Information Processing So
+ciety of China.
+ Ahmad Hany Hossny, Lewis Mitchell, Nick Lothian,
+ and Grant Osborne. 2020. Feature selection meth
+ods for event detection in twitter: a text mining ap
+proach. Soc. Netw. Anal. Min., 10(1):61.
+ Xiaonan Ji, Han-Wei Shen, Alan Ritter, Raghu Machi
+raju, and Po-Yin Yen. 2019. Visual exploration of
+ neural document embedding in information retrieval:
+ Semantics and feature selection. IEEE Trans. Vis.
+ Comput. Graph., 25(6):2181–2192.
+ Su Nam Kim, Olena Medelyan, Min-Yen Kan, and
+ Timothy Baldwin. 2010. SemEval-2010 task 5 : Au
+tomatic keyphrase extraction from scientific articles.
+ In Proceedings of the 5th International Workshop on
+ Semantic Evaluation, pages 21–26, Uppsala, Swe
+den. Association for Computational Linguistics.
+ Mikalai Krapivin, Aliaksandr Autayeu, and Maurizio
+ Marchese. 2008. Large dataset for keyphrases ex
+traction. In Technical Report DISI-09-055. Trento,
+ Italy.
+ Yinhan Liu, Myle Ott, Naman Goyal, Jingfei Du, Man
+dar Joshi, Danqi Chen, Omer Levy, Mike Lewis,
+ Luke Zettlemoyer, and Veselin Stoyanov. 2019.
+ Roberta: A robustly optimized BERT pretraining ap
+proach. CoRR, abs/1907.11692.
+ Debanjan Mahata, John Kuriakose, Rajiv Ratn Shah,
+ and Roger Zimmermann. 2018. Key2vec: Auto
+matic ranked keyphrase extraction from scientific ar
+ticles using phrase embeddings. In Proceedings of
+ the 2018 Conference of the North American Chap
+ter of the Association for Computational Linguistics:
+ Human Language Technologies, NAACL-HLT, New
+ Orleans, Louisiana, USA, June 1-6, 2018, Volume
+ 2 (Short Papers), pages 634–639. Association for
+ Computational Linguistics.
+ Olena Medelyan, Eibe Frank, and Ian H. Witten.
+ 2009. Human-competitive tagging using automatic
+ keyphrase extraction. In Proceedings of the 2009
+ Conference on Empirical Methods in Natural Lan
+guage Processing, pages 1318–1327, Singapore. As
+sociation for Computational Linguistics.
+ Rui Meng, Sanqiang Zhao, Shuguang Han, Daqing
+ He, Peter Brusilovsky, and Yu Chi. 2017. Deep
+ keyphrase generation. In Proceedings of the 55th
+ Annual Meeting of the Association for Computa
+tional Linguistics (Volume 1: Long Papers), pages
+ 582–592, Vancouver, Canada. Association for Com
+putational Linguistics.
+ Yu Meng, Jiaming Shen, Chao Zhang, and Jiawei Han.
+ 2019. Weakly-supervised hierarchical text classifi
+cation. In The Thirty-Third AAAI Conference on Ar
+tificial Intelligence, AAAI 2019, The Thirty-First In
+novative Applications of Artificial Intelligence Con
+ference, IAAI 2019, The Ninth AAAI Symposium
+ on Educational Advances in Artificial Intelligence,
+ EAAI 2019, Honolulu, Hawaii, USA, January 27
+February 1, 2019, pages 6826–6833. AAAI Press.
+ Rada Mihalcea and Paul Tarau. 2004. Textrank: Bring
+ing order into text. In Proceedings of the 2004 Con
+ference on Empirical Methods in Natural Language
+ Processing , EMNLP 2004, A meeting of SIGDAT, a
+ Special Interest Group of the ACL, held in conjunc
+tion with ACL 2004, 25-26 July 2004, Barcelona,
+ Spain, pages 404–411. ACL.
+ Thuy Dung Nguyen and Min-Yen Kan. 2007.
+ Keyphrase extraction in scientific publications. In
+ Asian Digital Libraries. Looking Back 10 Years
+ and Forging New Frontiers, 10th International Con
+ference on Asian Digital Libraries, ICADL 2007,
+ Hanoi, Vietnam, December 10-13, 2007, Proceed
+ings, volume 4822 of Lecture Notes in Computer Sci
+ence, pages 317–326. Springer.
+ Thuy Dung Nguyen and Minh-Thang Luong. 2010.
+ WINGNUS: Keyphrase extraction utilizing docu
+ment logical structure. In Proceedings of the 5th
+ International Workshop on Semantic Evaluation,
+ pages 166–169, Uppsala, Sweden. Association for
+ Computational Linguistics.
+ Eirini Papagiannopoulou and Grigorios Tsoumakas.
+ 2018. Local word vectors guiding keyphrase extrac
+tion. Inf. Process. Manag., 54(6):888–902.
+ Krutarth Patel and Cornelia Caragea. 2019. Exploring
+ word embeddings in crf-based keyphrase extraction
+ from research papers. In Proceedings of the 10th
+ International Conference on Knowledge Capture, K
+CAP2019, MarinaDelRey, CA,USA,November19
+21, 2019, pages 37–44. ACM.
+ François Rousseau and Michalis Vazirgiannis. 2015.
+ Main core retention on graph-of-words for single
+document keyword extraction. In Advances in Infor
+mation Retrieval- 37th European Conference on IR
+ 54
+Research, ECIR 2015, Vienna, Austria, March 29
+April 2, 2015. Proceedings, volume 9022 of Lecture
+ Notes in Computer Science, pages 382–393.
+ Dhruva Sahrawat, Debanjan Mahata, Haimin Zhang,
+ Mayank Kulkarni, Agniv Sharma, Rakesh Gosangi,
+ Amanda Stent, Yaman Kumar, Rajiv Ratn Shah, and
+ Roger Zimmermann. 2020. Keyphrase extraction as
+ sequence labeling using contextualized embeddings.
+ In Advances in Information Retrieval- 42nd Euro
+pean Conference on IR Research, ECIR 2020, Lis
+bon, Portugal, April 14-17, 2020, Proceedings, Part
+ II, volume 12036 of Lecture Notes in Computer Sci
+ence, pages 328–335. Springer.
+ Victor Sanh, Lysandre Debut, Julien Chaumond, and
+ Thomas Wolf. 2019. Distilbert, a distilled version
+ of BERT: smaller, faster, cheaper and lighter. CoRR,
+ abs/1910.01108.
+ Shengli Song, Haitao Huang, and Tongxiao Ruan.
+ 2019. Abstractive text summarization using LSTM
+CNN based deep learning. Multim. Tools Appl.,
+ 78(1):857–875.
+ Lucas Sterckx, Thomas Demeester, Johannes Deleu,
+ and Chris Develder. 2015. Topical word importance
+ for fast keyphrase extraction. In Proceedings of
+ the 24th International Conference on World Wide
+ Web Companion, WWW 2015, Florence, Italy, May
+ 18-22, 2015- Companion Volume, pages 121–122.
+ ACM.
+ Xiaojun Wan and Jianguo Xiao. 2008. Single doc
+ument keyphrase extraction using neighborhood
+ knowledge. In Proceedings of the Twenty-Third
+ AAAI Conference on Artificial Intelligence, AAAI
+ 2008, Chicago, Illinois, USA, July 13-17, 2008,
+ pages 855–860. AAAI Press.
+ Liang Wang and Sujian Li. 2017. PKU_ICL at
+ SemEval-2017 task 10: Keyphrase extraction with
+ model ensemble and external knowledge. In Pro
+ceedings of the 11th International Workshop on Se
+mantic Evaluation (SemEval-2017), pages 934–937,
+ Vancouver, Canada. Association for Computational
+ Linguistics.
+ Yanan Wang, Qi Liu, Chuan Qin, Tong Xu, Yijun
+ Wang, Enhong Chen, and Hui Xiong. 2018. Exploit
+ing topic-based adversarial neural network for cross
+domain keyphrase extraction. In IEEE International
+ Conference on DataMining, ICDM2018, Singapore,
+ November 17-20, 2018, pages 597–606. IEEE Com
+puter Society.
+ Ian H. Witten, Gordon W. Paynter, Eibe Frank, Carl
+ Gutwin, and Craig G. Nevill-Manning. 1999. KEA:
+ practical automatic keyphrase extraction. In Pro
+ceedings of the Fourth ACM conference on Digital
+ Libraries, August 11-14, 1999, Berkeley, CA, USA,
+ pages 254–255. ACM.
+ Hai Ye and Lu Wang. 2018. Semi-supervised learning
+ for neural keyphrase generation. In Proceedings of
+ the 2018 Conference on Empirical Methods in Nat
+ural Language Processing, pages 4142–4153, Brus
+sels, Belgium. Association for Computational Lin
+guistics.
+ Amin Ghazi Zahedi, Morteza Zahedi, and Mansoor
+ Fateh. 2020. A deep extraction model for an unseen
+ keyphrase detection. Soft Comput., 24(11):8233
+8242.
+ Tao Zhou, Yuxiang Zhang, and Haoxiang Zhu. 2020.
+ Multi-level memory network with crfs for keyphrase
+ extraction. In Advances in Knowledge Discovery
+ and Data Mining- 24th Pacific-Asia Conference,
+ PAKDD 2020, Singapore, May 11-14, 2020, Pro
+ceedings, Part I, volume 12084 of Lecture Notes in
+ Computer Science, pages 726–738. Springer.
+ Xun Zhu, Chen Lyu, Donghong Ji, Han Liao, and
+ Fei Li. 2020.
+ Deep neural model with self
+training for scientific keyphrase extraction. Plos
+ one, 15(5):e0232547."
+}

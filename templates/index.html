@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Summarization Tool</title>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+    
+    h1 {
+        text-align: center;
+        margin-top: 20px;
+    }
+    
+    #summarizeForm {
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    label {
+        font-weight: bold;
+    }
+    
+    input[type="text"],
+    textarea {
+        width: 100%;
+        padding: 8px;
+        margin-top: 6px;
+        margin-bottom: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        resize: vertical;
+    }
+    
+    button[type="submit"] {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+    
+    button[type="submit"]:hover {
+        background-color: #45a049;
+    }
+    
+    #result {
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: #f9f9f9;
+    }
+    
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+    
+    li {
+        margin-bottom: 6px;
+    }
+</style>
+</head>
+
+<body>
+    <h1>Keyphrase Extraction Tool</h1>
+    <form id="summarizeForm">
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="title"><br>
+        <label for="abstract">Abstract:</label><br>
+        <textarea id="abstract" name="abstract"></textarea><br>
+        <label for="fulltext">Full Text:</label><br>
+        <textarea id="fulltext" name="fulltext"></textarea><br><br>
+        <button type="submit" id="submitButton">Submit</button>
+    </form>
+
+    <div id="result"></div>
+
+    <script>
+        document.getElementById('summarizeForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            document.getElementById('submitButton').textContent = 'Extracting...';
+            document.getElementById('submitButton').disabled = true; 
+    
+            const formData = new FormData(this);
+    
+            // Construct JSON object with title, abstract, and fulltext
+            const jsonData = {};
+            formData.forEach((value, key) => {
+                jsonData[key] = value;
+            });
+    
+            const response = await fetch('/summarize', {
+                method: 'POST',
+                body: JSON.stringify(jsonData),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+    
+            const data = await response.json();
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<h2>Predicted Keyphrases:</h2><ul>' + data.predicted_keyphrases.map(kp => `<li>${kp}</li>`).join('') + '</ul>';
+        });
+    </script>
+    
+</body>
+</html>
