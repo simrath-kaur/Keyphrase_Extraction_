@@ -23,17 +23,23 @@ datasets\summarization_experiment.
 References:
 TransformerSum :
 https://github.com/HHousen/TransformerSum
-● DistilRoBERTa:https://huggingface.co/distilbert/distilr
-oberta-base
+● DistilRoBERTa:https://huggingface.co/distilbert/distilroberta-base
+
 ● Datasets:
+
 SemEval: https://github.com/boudinfl/akedatasets/tree/master/datasets/SemEval-2010
 ACM: https://github.com/boudinfl/akedatasets/tree/master/datasets/ACM
 NUS: https://paperswithcode.com/dataset/nus
+
 ● Pytorch-lightning Library:
 https://lightning.ai/docs/pytorch/stable/
+
 ● NLTK: https://www.nltk.org/
+
 ● Glove
 Embeddings:https://www.kaggle.com/datasets/daniel
 willgeorge/glove6b100dtxt
+
 ● spaCy: https://pypi.org/project/spacy/
+
 ● Flask: https://flask.palletsprojects.com/en/3.0.x/
